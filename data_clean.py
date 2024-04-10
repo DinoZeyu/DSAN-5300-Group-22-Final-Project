@@ -1,7 +1,7 @@
 import pandas as pd
 from sklearn.preprocessing import LabelEncoder
 
-## Read file
+## Read file 
 df1 = pd.read_csv('Data/listings_detail.csv')
 
 ## Drop unnecessary features by hand
