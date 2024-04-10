@@ -4,6 +4,7 @@ from sklearn.preprocessing import LabelEncoder
 ## Read file
 df1 = pd.read_csv('Data/listings_detail.csv')
 
+## Drop unnecessary features by hand
 df1 = df1.drop(columns = ['id',"host_id",'name','listing_url', 'scrape_id', 'last_scraped', 'source','description', 'picture_url','host_url', 'host_name',
                           'host_thumbnail_url', 'host_picture_url','host_neighbourhood','host_listings_count','host_verifications',
                           'neighbourhood','neighbourhood_cleansed', 'neighbourhood_group_cleansed', 'latitude','longitude','bathrooms',
