@@ -82,5 +82,5 @@ df1['last_review'] = pd.to_datetime(df1['last_review'])
 df1['review_years_range']= round(((df1['last_review'] - df1['first_review']) / pd.Timedelta(days=365.25)).astype(float),2)
 df1.drop(columns=['first_review','last_review'],inplace=True)
 
-## Store the clean data
-df1.to_csv('cleaned.csv', index=False)
+## Store the clean data for using R 
+df1.to_csv('Data/cleaned.csv', index=False)
