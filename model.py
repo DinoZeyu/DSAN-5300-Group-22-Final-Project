@@ -109,30 +109,10 @@ class Classifier:
         ax2.set_xlabel('False Positive Rate')
         ax2.set_ylabel('True Positive Rate')
         ax2.set_title('ROC Curve')
-        ax2.legend(loc='lower left')
+        ax2.legend(loc='lower right')
 
         plt.tight_layout()
         plt.show()
-
-
-
-## Define the parameters for the models
-params_lr={'max_iter': 1000, 'C': 0.5}
-params_svm={'kernel': 'linear', 'C': 0.5, 'probability': True}
-params_lda = {'solver': 'svd'}
-params_qda = {'reg_param': 0.5}
-
-## Define the parameter grid for the models
-params_lr_grid = {'max_iter': [1000, 2000, 3000], 'C': [0.1, 0.5, 1.0],
-                  'penalty': ['l1', 'l2','none'],
-                  'solver': ['liblinear', 'saga']}
-
-params_svm_grid = {'kernel': ['linear', 'rbf', 'poly', 'sigmoid'],'C': [0.1, 0.5, 1.0],
-                   'gamma': ['scale', 'auto', 0.1, 0.01, 0.001],  
-                   'degree': [2, 3, 4]}
-
-params_lda_grid = {'solver': ['svd', 'lsqr', 'eigen'], 'shrinkage': [None, 'auto', 0.1, 0.5, 0.9]}
-params_qda_grid = {'reg_param': [0.1, 1, 10]}
 
 
 ## Data Processing，we decided to use features from Chi-square test as the input for the model
@@ -284,3 +264,38 @@ print(f"Support: {support}")
 
 ## Plot the confusion matrix and ROC curve
 model_qda.plot(confusion, y_prob, y_test)
+
+
+
+## Model Comparison
+table = pd.DataFrame({'Model': ['LR', 'SVM', 'LDA', 'QDA', 'RFC'],
+                      'Accuracy': [lrg_accuracy, svm_accuracy, lda_accuracy, qda_accuracy, 0.88]})
+
+## Assign colors and markers to each model
+color_dict = {'LR': 'red', 'SVM': 'blue', 'LDA': 'green', 'QDA': 'purple', 'RFC': 'orange'}
+marker_dict = {'LR': 'o', 'SVM': 's', 'LDA': '^', 'QDA': 'p', 'RFC': '*'}
+
+# Get current axis and its legend labels to manage legend entries
+ax = plt.gca()
+legend_labels = set()
+
+# Create a scatter plot with different markers and colors
+for i, row in table.iterrows():
+    if row['Model'] not in legend_labels:
+        plt.scatter(row['Model'], row['Accuracy'], color=color_dict[row['Model']],
+                    marker=marker_dict[row['Model']], label=row['Model'], s = 75)
+        legend_labels.add(row['Model'])
+    else:
+        plt.scatter(row['Model'], row['Accuracy'], color=color_dict[row['Model']],
+                    marker=marker_dict[row['Model']], s = 75)
+
+# Adding labels and title
+plt.title('Model Accuracy')
+plt.xlabel('Model')
+plt.ylabel('Accuracy')
+plt.yticks(np.arange(0, 1.1, 0.1))
+
+# Adding legend to show marker and color associations
+plt.legend(title="Model", loc='center left', bbox_to_anchor=(1, 0.5))
+plt.show()
+
