@@ -11,4 +11,4 @@ We will analyze the location, pricing, ratings, and availability of Airbnb prope
 
 ## Methodology
 
-Subset selection, Ridge Regression, Lasso Regression, Logistic regression, Linear Discriminant Analysis (LDA), Quadratic Discriminant Analysis (QDA) and Neural Networks (ANN).
+Ridge Regression, Lasso Regression, Logistic regression, Random Forest,Linear Discriminant Analysis (LDA), Quadratic Discriminant Analysis (QDA) and Neural Networks (ANN).
