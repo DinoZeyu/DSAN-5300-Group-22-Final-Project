@@ -1,8 +1,10 @@
 from sklearn.model_selection import train_test_split
 from sklearn.preprocessing import StandardScaler, label_binarize
 from sklearn.linear_model import LogisticRegression
+from sklearn import tree
 from sklearn.svm import SVC
 from sklearn.discriminant_analysis import LinearDiscriminantAnalysis, QuadraticDiscriminantAnalysis
+from sklearn.ensemble import RandomForestClassifier
 from sklearn.model_selection import GridSearchCV
 from sklearn.metrics import confusion_matrix, roc_curve, auc, roc_auc_score, accuracy_score, classification_report, precision_score, recall_score, f1_score
 import matplotlib.pyplot as plt
@@ -21,6 +23,8 @@ class Classifier:
         self.model_svm = SVC(**(params_svm if params_svm is not None else {}))
         self.model_lda = LinearDiscriminantAnalysis(**(params_lda if params_lda is not None else {}))
         self.model_qda = QuadraticDiscriminantAnalysis(**(params_qda if params_qda is not None else {}))
+        self.model_tree = tree.DecisionTreeClassifier()
+        self.model_rfc = RandomForestClassifier(**(params_rfc if params_rfc is not None else {}))
 
     def fit(self, X_train, y_train, X_val,model_name):
         if model_name == 'lr':
@@ -39,6 +43,14 @@ class Classifier:
             self.model_qda.fit(X_train, y_train)
             y_pred = self.model_qda.predict(X_train)
             y_prob = self.model_qda.predict_proba(X_val)
+        elif model_name == 'tree':
+            self.model_tree.fit(X_train, y_train)
+            y_pred = self.model_tree.predict(X_val)
+            y_prob = self.model_tree.predict_proba(X_val)
+        elif model_name == 'rfc':
+            self.model_rfc.fit(X_train, y_train)
+            y_pred = self.model_rfc.predict(X_val)
+            y_prob = self.model_rfc.predict_proba(X_val)
         else:
             raise ValueError("Invalid model name. Please choose from 'lr', 'svm', 'lda', or 'qda'.")
 
@@ -53,6 +65,8 @@ class Classifier:
             grid = GridSearchCV(self.model_lda, param_grid, n_jobs=-1)
         elif model_name == 'qda':
             grid = GridSearchCV(self.model_qda, param_grid, n_jobs=-1)
+        elif model_name == 'rfc':
+            grid = GridSearchCV(self.model_rfc, param_grid, n_jobs=-1)
         else:
             raise ValueError("Invalid model name. Please choose from 'lr', 'svm', 'lda', or 'qda'.")
 
@@ -139,6 +153,7 @@ params_lr={'max_iter': 1000, 'C': 0.5}
 params_svm={'kernel': 'linear', 'C': 0.5, 'probability': True}
 params_lda = {'solver': 'svd'}
 params_qda = {'reg_param': 0.5}
+params_rfc = {'max_depth': 5}
 
 ## Define the parameter grid for the models
 params_lr_grid = {'max_iter': [1000, 2000, 3000], 'C': [0.1, 0.5, 1.0],
@@ -267,13 +282,58 @@ model_qda.plot(confusion, y_prob, y_test)
 
 
 
+
+# Random Forest Classifier
+model_rfc = Classifier(params_rfc=params_rfc)
+
+y_pred_rfc, y_prob_rfc = model_rfc.fit(X_train, y_train, X_test, 'rfc')
+
+
+best_parameters, y_pred_opt = model_rfc.tune(X_train, y_train, X_test, params_rfc_grid, 'rfc')
+print(f"Best parameters: {best_parameters}")
+
+auc_score, rfc_accuracy, report, confusion, percision, recall, f1, support = model_rfc.report(y_pred_opt, y_test, y_prob_rfc)
+
+print(f"AUC Score: {auc_score}")
+print(f"Accuracy: {rfc_accuracy}")
+print(f"Report: {report}")
+print(f"Precision: {percision}")
+print(f"Recall: {recall}")
+print(f"F1 Score: {f1}")
+print(f"Support: {support}")
+
+model_rfc.plot(confusion, y_prob_rfc, y_test)
+
+
+
+# Decision Tree Classifier
+model_tree = Classifier()
+y_pred_rfc, y_prob_rfc  = model_tree.fit(X_train, y_train, X_test, 'tree')
+
+auc_score, tree_accuracy, report, confusion, percision, recall, f1, support = model_tree.report(y_pred_rfc, y_test, y_prob_rfc)
+
+print(f"AUC Score: {auc_score}")
+print(f"Accuracy: {tree_accuracy}")
+print(f"Report: {report}")
+print(f"Confusion Matrix: {confusion}")
+print(f"Percision: {percision}")
+print(f"Recall: {recall}")
+print(f"F1: {f1}")
+print(f"Support: {support}")
+
+model_tree.plot(confusion, y_prob_rfc, y_test)
+
+
+
+
 ## Model Comparison
-table = pd.DataFrame({'Model': ['LR', 'SVM', 'LDA', 'QDA', 'RFC'],
-                      'Accuracy': [lrg_accuracy, svm_accuracy, lda_accuracy, qda_accuracy, 0.88]})
+table = pd.DataFrame({'Model': ['LR', 'SVM', 'LDA', 'QDA', 'RFC', 'Tree'],
+                      'Accuracy': [lrg_accuracy, svm_accuracy, lda_accuracy, qda_accuracy, rfc_accuracy, tree_accuracy]})
+
 
 ## Assign colors and markers to each model
-color_dict = {'LR': 'red', 'SVM': 'blue', 'LDA': 'green', 'QDA': 'purple', 'RFC': 'orange'}
-marker_dict = {'LR': 'o', 'SVM': 's', 'LDA': '^', 'QDA': 'p', 'RFC': '*'}
+color_dict = {'LR': 'red', 'SVM': 'blue', 'LDA': 'green', 'QDA': 'purple', 'RFC': 'orange', 'Tree': 'pink'}
+marker_dict = {'LR': 'o', 'SVM': 's', 'LDA': '^', 'QDA': 'p', 'RFC': '*', 'Tree': 'D'}
 
 # Get current axis and its legend labels to manage legend entries
 ax = plt.gca()
@@ -293,7 +353,7 @@ for i, row in table.iterrows():
 plt.title('Model Accuracy')
 plt.xlabel('Model')
 plt.ylabel('Accuracy')
-plt.yticks(np.arange(0, 1.1, 0.1))
+plt.yticks(np.arange(0, 1.1, 0.2))
 
 # Adding legend to show marker and color associations
 plt.legend(title="Model", loc='center left', bbox_to_anchor=(1, 0.5))
