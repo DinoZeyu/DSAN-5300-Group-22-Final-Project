@@ -58,6 +58,9 @@ plt.show()
 for t, names in zip(thresholds, low_variance_cols_list):
     print(f"Variance Threshold: {t:.1f} -> Low Variance Columns: {names}")
 
+# According to the plot, we would like to choose the features with threshold as 0.4 - 0.7 as the chosen features
+print("Variance Threshold selected features",low_variance_cols_list[4])
+
 
 ## Thirdly, I would like to use the PCA method to select the features
 data = df1.copy()
