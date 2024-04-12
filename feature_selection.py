@@ -59,7 +59,8 @@ for t, names in zip(thresholds, low_variance_cols_list):
     print(f"Variance Threshold: {t:.1f} -> Low Variance Columns: {names}")
 
 # According to the plot, we would like to choose the features with threshold as 0.4 - 0.7 as the chosen features
-print("Variance Threshold selected features",low_variance_cols_list[4])
+vt_features = low_variance_cols_list[4]
+print("Variance Threshold selected features: ",vt_features)
 
 
 ## Thirdly, I would like to use the PCA method to select the features
@@ -107,9 +108,9 @@ loadings_df = pd.DataFrame(loadings.T, columns=[f'PC{i+1}' for i in range(loadin
 
 # Calculate the absolute sum of loadings for each feature to see their overall contribution
 feature_importance = np.abs(loadings_df).sum(axis=1).sort_values(ascending=False)
-
+pca_features = feature_importance[0:23].index
 # Display the feature importance according to the PCA plot
-print("PCA selected features",feature_importance[0:23].index)
+print("PCA selected features: ",pca_features)
 
 
 
@@ -125,6 +126,11 @@ X_kbest_features = chi_selector.fit_transform(X_scaled_non_negative, y)
 
 # Get the selected feature indices and names
 selected_indices = chi_selector.get_support(indices=True)
-selected_feature_names = X.columns[selected_indices]
+chi_features = X.columns[selected_indices]
 
-print("Chi-square selected features:", selected_feature_names)
+print("Chi-square selected features:", chi_features)
+
+
+## In conclusion, we would like to choose the features selected by PCA, VarianceThreshold and Chi-Square test
+## These features are the most important features which selected by three different methods
+print("Common features between all three methods \n",set(vt_features)&set(pca_features)&set(chi_features))
