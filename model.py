@@ -185,11 +185,11 @@ best_parameters, y_pred_opt = model_lrg.tune(X_train, y_train, X_test, params_lr
 print(f"Best Parameters: {best_parameters}")
 
 ## Get the report for each metric
-auc_score,accuracy, report, confusion, percision, recall, f1, support = model_lrg.report(y_pred_opt, y_test, y_prob)
+auc_score,lrg_accuracy, report, confusion, percision, recall, f1, support = model_lrg.report(y_pred_opt, y_test, y_prob)
 
 print("\nLogistic Regression")
 print(f"AUC: {auc_score}")
-print(f"Accuracy: {accuracy}")
+print(f"Accuracy: {lrg_accuracy}")
 print(f"Report: {report}")
 print(f"Confusion Matrix: {confusion}")
 print(f"Percision: {percision}")
@@ -213,11 +213,11 @@ best_parameters, y_pred_opt = model_svm.tune(X_train, y_train, X_test, params_sv
 print(f"Best Parameters: {best_parameters}")
 
 ## Get the report for each metric
-auc_score, accuracy, report, confusion, percision, recall, f1, support = model_svm.report(y_pred_opt, y_test, y_prob)
+auc_score, svm_accuracy, report, confusion, percision, recall, f1, support = model_svm.report(y_pred_opt, y_test, y_prob)
 
 print("\n Support Vector Machine")
 print(f"AUC: {auc_score}")
-print(f"Accuracy: {accuracy}")
+print(f"Accuracy: {svm_accuracy}")
 print(f"Report: {report}")
 print(f"Confusion Matrix: {confusion}")
 print(f"Percision: {percision}")
@@ -241,11 +241,11 @@ best_parameters, y_pred_opt = model_lda.tune(X_train, y_train, X_test, params_ld
 print(f"Best Parameters: {best_parameters}")
 
 ## Get the report for each metric
-auc_score, accuracy, report, confusion, percision, recall, f1, support = model_lda.report(y_pred_opt, y_test, y_prob)
+auc_score, lda_accuracy, report, confusion, percision, recall, f1, support = model_lda.report(y_pred_opt, y_test, y_prob)
 
 print("\nLinear Discriminant Analysis")
 print(f"AUC: {auc_score}")
-print(f"Accuracy: {accuracy}")
+print(f"Accuracy: {lda_accuracy}")
 print(f"Report: {report}")
 print(f"Confusion Matrix: {confusion}")
 print(f"Percision: {percision}")
@@ -270,11 +270,11 @@ best_parameters, y_pred_opt = model_qda.tune(X_train, y_train, X_test, params_qd
 print(f"Best Parameters: {best_parameters}")
 
 ## Get the report for each metric
-auc_score, accuracy, report, confusion, percision, recall, f1, support = model_qda.report(y_pred_opt, y_test, y_prob)
+auc_score, qda_accuracy, report, confusion, percision, recall, f1, support = model_qda.report(y_pred_opt, y_test, y_prob)
 
 print("\nQuadratic Discriminant Analysis")
 print(f"AUC: {auc_score}")
-print(f"Accuracy: {accuracy}")
+print(f"Accuracy: {qda_accuracy}")
 print(f"Report: {report}")
 print(f"Confusion Matrix: {confusion}")
 print(f"Percision: {percision}")
