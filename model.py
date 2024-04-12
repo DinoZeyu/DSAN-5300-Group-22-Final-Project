@@ -335,32 +335,43 @@ model_tree.plot(confusion, y_prob_rfc, y_test)
 table = pd.DataFrame({'Model': ['LR', 'SVM', 'LDA', 'QDA', 'RFC', 'Tree'],
                       'Accuracy': [lrg_accuracy, svm_accuracy, lda_accuracy, qda_accuracy, rfc_accuracy, tree_accuracy]})
 
-
-## Assign colors and markers to each model
-color_dict = {'LR': 'red', 'SVM': 'blue', 'LDA': 'green', 'QDA': 'purple', 'RFC': 'orange', 'Tree': 'pink'}
+color_palette = sns.color_palette("Set2")  # Using seaborn to get a set of colors
+color_dict = dict(zip(table['Model'], color_palette))
 marker_dict = {'LR': 'o', 'SVM': 's', 'LDA': '^', 'QDA': 'p', 'RFC': '*', 'Tree': 'D'}
 
-# Get current axis and its legend labels to manage legend entries
+# Get current axis
 ax = plt.gca()
-legend_labels = set()
+ax.set_facecolor('#f8f8f8')  # A slightly darker shade of grey for the face
+
+# Grid lines can be softer and less pronounced
+ax.grid(True, which='both', axis='both', linestyle='-', linewidth=0.75, color='lightgrey', alpha=0.5)
 
 # Create a scatter plot with different markers and colors
-for i, row in table.iterrows():
-    if row['Model'] not in legend_labels:
-        plt.scatter(row['Model'], row['Accuracy'], color=color_dict[row['Model']],
-                    marker=marker_dict[row['Model']], label=row['Model'], s = 75)
-        legend_labels.add(row['Model'])
-    else:
-        plt.scatter(row['Model'], row['Accuracy'], color=color_dict[row['Model']],
-                    marker=marker_dict[row['Model']], s = 75)
+for model, row in table.iterrows():
+    ax.scatter(row['Model'], row['Accuracy'], color=color_dict[row['Model']],
+               marker=marker_dict[row['Model']], label=row['Model'],
+               s=150, edgecolors='black', linewidths=0.5)
+    
+# Adding labels and title with increased font size
+plt.title('Model Accuracy', fontsize=16)
+plt.xlabel('Model', fontsize=14)
+plt.ylabel('Accuracy', fontsize=14)
+plt.xticks(fontsize=12)
+plt.yticks(np.arange(0.4, 1.1, 0.1), fontsize=12)
 
-# Adding labels and title
-plt.title('Model Accuracy')
-plt.xlabel('Model')
-plt.ylabel('Accuracy')
-plt.yticks(np.arange(0, 1.1, 0.2))
+# Remove the top and right spines
+ax.spines['top'].set_visible(False)
+ax.spines['right'].set_visible(False)
 
-# Adding legend to show marker and color associations
-plt.legend(title="Model", loc='center left', bbox_to_anchor=(1, 0.5))
+# Leave only bottom and left spines and make them lighter and less pronounced
+ax.spines['left'].set_color('lightgrey')
+ax.spines['left'].set_linewidth(0.5)
+ax.spines['bottom'].set_color('lightgrey')
+ax.spines['bottom'].set_linewidth(0.5)
+
+# Adding a legend outside of the plot with optimized layout and font size
+leg = ax.legend(title="Model", loc='upper left', bbox_to_anchor=(1, 1), frameon=False, fontsize=12)
+plt.setp(leg.get_title(), fontsize=14)
+
+plt.tight_layout()
 plt.show()
-
