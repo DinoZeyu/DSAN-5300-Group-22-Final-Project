@@ -8,6 +8,7 @@ from sklearn.ensemble import RandomForestClassifier
 from sklearn.model_selection import GridSearchCV
 from sklearn.metrics import confusion_matrix, roc_curve, auc, roc_auc_score, accuracy_score, classification_report, precision_score, recall_score, f1_score
 import matplotlib.pyplot as plt
+from matplotlib.colors import LinearSegmentedColormap, hex2color
 import seaborn as sns
 import numpy as np
 import pandas as pd
@@ -15,7 +16,11 @@ from itertools import cycle
 import warnings
 warnings.filterwarnings("ignore")
 
-
+# Convert hex color to RGB
+color_hex = "#fe595dff"
+color_rgb = hex2color(color_hex)
+# Create a custom colormap
+cmap = LinearSegmentedColormap.from_list("mycmap", [(1, 1, 1), color_rgb], N=256)
 
 class Classifier:
     def __init__(self, params_lr=None, params_svm=None, params_lda=None, params_qda=None):
@@ -94,7 +99,7 @@ class Classifier:
         fig, (ax1, ax2) = plt.subplots(2, 1, figsize=(10, 15))
 
         # Confusion Matrix
-        sns.heatmap(confusion, annot=True, fmt='d', cmap='YlGnBu', ax=ax1)
+        sns.heatmap(confusion, annot=True, fmt='d', cmap=cmap, ax=ax1)
         ax1.set_title('Confusion Matrix')
         ax1.set_xlabel('Predicted Label')
         ax1.set_ylabel('True Label')
