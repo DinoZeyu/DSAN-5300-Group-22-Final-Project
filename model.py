@@ -14,8 +14,11 @@ import numpy as np
 import pandas as pd
 from itertools import cycle
 import warnings
+import matplotlib
 warnings.filterwarnings("ignore")
 
+
+matplotlib.use('TkAgg')  # Set the backend
 # Convert hex color to RGB
 color_hex = "#fe595dff"
 color_rgb = hex2color(color_hex)
@@ -23,7 +26,7 @@ color_rgb = hex2color(color_hex)
 cmap = LinearSegmentedColormap.from_list("mycmap", [(1, 1, 1), color_rgb], N=256)
 
 class Classifier:
-    def __init__(self, params_lr=None, params_svm=None, params_lda=None, params_qda=None):
+    def __init__(self, params_lr=None, params_svm=None, params_lda=None, params_qda=None,params_rfc=None):
         self.model_lr = LogisticRegression(**(params_lr if params_lr is not None else {}), n_jobs=-1)
         self.model_svm = SVC(**(params_svm if params_svm is not None else {}))
         self.model_lda = LinearDiscriminantAnalysis(**(params_lda if params_lda is not None else {}))
@@ -94,7 +97,7 @@ class Classifier:
         return auc_score, accuracy, report, confusion, percision, recall, f1, support
 
 
-    def plot(self, confusion, y_prob, y_val):
+    def plot(self, confusion, y_prob, y_val,  save_fig=False, filename='model_plot.png'):
         # Initialize the figure
         fig, (ax1, ax2) = plt.subplots(2, 1, figsize=(10, 15))
 
@@ -131,6 +134,8 @@ class Classifier:
         ax2.legend(loc='lower right')
 
         plt.tight_layout()
+        if save_fig:
+            plt.savefig(filename, format='png', dpi=300)  
         plt.show()
 
 
@@ -171,7 +176,7 @@ params_svm_grid = {'kernel': ['linear', 'rbf', 'poly', 'sigmoid'],
 
 params_lda_grid = {'solver': ['svd', 'lsqr', 'eigen'], 'shrinkage': [None, 'auto', 0.1, 0.5, 0.9]}
 params_qda_grid = {'reg_param': [0.1, 1, 10]}
-
+params_rfc_grid = {'n_estimators': [100, 200, 300], 'max_depth': [5, 10, 15], 'min_samples_split': [2, 5, 10]}
 
 
 # Logistic Regression
@@ -198,7 +203,7 @@ print(f"F1: {f1}")
 print(f"Support: {support}")
 
 ## Plot the confusion matrix and ROC curve
-model_lrg.plot(confusion, y_prob, y_test)
+model_lrg.plot(confusion, y_prob, y_test,save_fig=True, filename='logistic_regression_analysis.png')
 
 
 
@@ -226,7 +231,7 @@ print(f"F1: {f1}")
 print(f"Support: {support}")
 
 ## Plot the confusion matrix and ROC curve
-model_svm.plot(confusion, y_prob, y_test)
+model_svm.plot(confusion, y_prob, y_test, save_fig=True, filename='support_vector_machine_analysis.png')
 
 
 
@@ -254,7 +259,7 @@ print(f"F1: {f1}")
 print(f"Support: {support}")
 
 ## Plot the confusion matrix and ROC curve
-model_lda.plot(confusion, y_prob, y_test)
+model_lda.plot(confusion, y_prob, y_test, save_fig=True, filename='linear_discriminant_analysis.png')
 
 
 
@@ -283,7 +288,7 @@ print(f"F1: {f1}")
 print(f"Support: {support}")
 
 ## Plot the confusion matrix and ROC curve
-model_qda.plot(confusion, y_prob, y_test)
+model_qda.plot(confusion, y_prob, y_test, save_fig=True, filename='quadratic_discriminant_analysis.png')
 
 
 
@@ -307,7 +312,7 @@ print(f"Recall: {recall}")
 print(f"F1 Score: {f1}")
 print(f"Support: {support}")
 
-model_rfc.plot(confusion, y_prob_rfc, y_test)
+model_rfc.plot(confusion, y_prob_rfc, y_test, save_fig=True, filename='random_forest_classifier.png')
 
 
 
@@ -326,7 +331,7 @@ print(f"Recall: {recall}")
 print(f"F1: {f1}")
 print(f"Support: {support}")
 
-model_tree.plot(confusion, y_prob_rfc, y_test)
+model_tree.plot(confusion, y_prob_rfc, y_test, save_fig=True, filename='decision_tree_classifier.png')
 
 
 
@@ -340,38 +345,44 @@ color_dict = dict(zip(table['Model'], color_palette))
 marker_dict = {'LR': 'o', 'SVM': 's', 'LDA': '^', 'QDA': 'p', 'RFC': '*', 'Tree': 'D'}
 
 # Get current axis
-ax = plt.gca()
-ax.set_facecolor('#f8f8f8')  # A slightly darker shade of grey for the face
+def plot_model_comparison(save_fig=False, filename='model_comparison.png'):
+    ax = plt.gca()
+    ax.set_facecolor('#f8f8f8')  # A slightly darker shade of grey for the face
 
-# Grid lines can be softer and less pronounced
-ax.grid(True, which='both', axis='both', linestyle='-', linewidth=0.75, color='lightgrey', alpha=0.5)
+    # Grid lines can be softer and less pronounced
+    ax.grid(True, which='both', axis='both', linestyle='-', linewidth=0.75, color='lightgrey', alpha=0.5)
 
-# Create a scatter plot with different markers and colors
-for model, row in table.iterrows():
-    ax.scatter(row['Model'], row['Accuracy'], color=color_dict[row['Model']],
-               marker=marker_dict[row['Model']], label=row['Model'],
-               s=150, edgecolors='black', linewidths=0.5)
+    # Create a scatter plot with different markers and colors
+    for model, row in table.iterrows():
+        ax.scatter(row['Model'], row['Accuracy'], color=color_dict[row['Model']],
+                marker=marker_dict[row['Model']], label=row['Model'],
+                s=150, edgecolors='black', linewidths=0.5)
+        
+    # Adding labels and title with increased font size
+    plt.title('Model Accuracy', fontsize=16)
+    plt.xlabel('Model', fontsize=14)
+    plt.ylabel('Accuracy', fontsize=14)
+    plt.xticks(fontsize=12)
+    plt.yticks(np.arange(0.4, 1.1, 0.1), fontsize=12)
+
+    # Remove the top and right spines
+    ax.spines['top'].set_visible(False)
+    ax.spines['right'].set_visible(False)
+
+    # Leave only bottom and left spines and make them lighter and less pronounced
+    ax.spines['left'].set_color('lightgrey')
+    ax.spines['left'].set_linewidth(0.5)
+    ax.spines['bottom'].set_color('lightgrey')
+    ax.spines['bottom'].set_linewidth(0.5)
+
+    # Adding a legend outside of the plot with optimized layout and font size
+    leg = ax.legend(title="Model", loc='upper left', bbox_to_anchor=(1, 1), frameon=False, fontsize=12)
+    plt.setp(leg.get_title(), fontsize=14)
     
-# Adding labels and title with increased font size
-plt.title('Model Accuracy', fontsize=16)
-plt.xlabel('Model', fontsize=14)
-plt.ylabel('Accuracy', fontsize=14)
-plt.xticks(fontsize=12)
-plt.yticks(np.arange(0.4, 1.1, 0.1), fontsize=12)
+    plt.tight_layout()
+    if save_fig:
+        plt.savefig(filename, format='png', dpi=300)
+        print(f"Saved figure as {filename}")
+    plt.show()
 
-# Remove the top and right spines
-ax.spines['top'].set_visible(False)
-ax.spines['right'].set_visible(False)
-
-# Leave only bottom and left spines and make them lighter and less pronounced
-ax.spines['left'].set_color('lightgrey')
-ax.spines['left'].set_linewidth(0.5)
-ax.spines['bottom'].set_color('lightgrey')
-ax.spines['bottom'].set_linewidth(0.5)
-
-# Adding a legend outside of the plot with optimized layout and font size
-leg = ax.legend(title="Model", loc='upper left', bbox_to_anchor=(1, 1), frameon=False, fontsize=12)
-plt.setp(leg.get_title(), fontsize=14)
-
-plt.tight_layout()
-plt.show()
+plot_model_comparison(save_fig=True, filename='model_comparison.png')
