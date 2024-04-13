@@ -21,4 +21,4 @@ Logistic regression, Support Vector Machine (SVM),RandomForest Classifier , Deci
 
 * ml_model.py: This script fits the models derived from methodlogy to the data and evaluates their performance using cross-validation. It also selects the best model based on the evaluation metrics.
 
-* dl_model.py: This script fits an ann neural network model to the data and evaluates its performance using cross-validation. It also tunes the hyperparameters of the model to improve its performance.
+* dl_model.py: This script fits an ann neural network model to the data and evaluates its performance using cross-validation. It also tunes the hyperparameters of the model to improve its performance. I cannot run it on my local machine because of the tensorflow version issue. But I developed it on google colab.

@@ -337,12 +337,12 @@ model_tree.plot(confusion, y_prob_rfc, y_test, save_fig=True, filename='decision
 
 
 ## Model Comparison
-table = pd.DataFrame({'Model': ['LR', 'SVM', 'LDA', 'QDA', 'RFC', 'Tree'],
-                      'Accuracy': [lrg_accuracy, svm_accuracy, lda_accuracy, qda_accuracy, rfc_accuracy, tree_accuracy]})
+table = pd.DataFrame({'Model': ['LR', 'SVM', 'LDA', 'QDA', 'RFC', 'Tree', "ANN"],
+                      'Accuracy': [lrg_accuracy, svm_accuracy, lda_accuracy, qda_accuracy, rfc_accuracy, tree_accuracy, 0.8463]})
 
 color_palette = sns.color_palette("Set2")  # Using seaborn to get a set of colors
 color_dict = dict(zip(table['Model'], color_palette))
-marker_dict = {'LR': 'o', 'SVM': 's', 'LDA': '^', 'QDA': 'p', 'RFC': '*', 'Tree': 'D'}
+marker_dict = {'LR': 'o', 'SVM': 's', 'LDA': '^', 'QDA': 'p', 'RFC': '*', 'Tree': 'D', 'ANN': 'X'}
 
 # Get current axis
 def plot_model_comparison(save_fig=False, filename='model_comparison.png'):
